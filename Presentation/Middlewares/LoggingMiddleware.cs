@@ -55,6 +55,7 @@ public class LoggingMiddleware
                 request.Method, request.Path, response.StatusCode, stopwatch.ElapsedMilliseconds,
                 ipAddress, userAgent, user);
 
+            responseBody.Seek(0, SeekOrigin.Begin);
             await responseBody.CopyToAsync(originalBodyStream);
         }
         context.Response.Body = originalBodyStream;
