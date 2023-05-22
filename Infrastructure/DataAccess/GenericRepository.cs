@@ -7,7 +7,7 @@ namespace Infrastructure.DataAccess;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
-    public GenericRepository(BookStoreDbContext context)
+    protected GenericRepository(BookStoreDbContext context)
         => _context = context;
 
     private readonly BookStoreDbContext _context;

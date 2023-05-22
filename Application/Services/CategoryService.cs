@@ -36,7 +36,7 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryDto> GetCategory(Guid id)
     {
-        var category = await _repository.Category!.FindByCondition(m => m.Id == id, false).FirstOrDefaultAsync();
+        var category = await _repository.Category!.FindByCondition(m => m.Id == id).FirstOrDefaultAsync();
         return _mapper.Map<CategoryDto>(category);
     }
 

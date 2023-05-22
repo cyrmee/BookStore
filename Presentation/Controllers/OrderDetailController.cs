@@ -23,7 +23,7 @@ public class OrderDetailController : ControllerBase
         return Ok(orderDetails);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<OrderDetailDto>> GetOrderDetail(Guid id)
     {
         var orderDetail = await _orderDetailService.GetOrderDetail(id);
@@ -51,7 +51,7 @@ public class OrderDetailController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteOrderDetail(Guid id)
     {
         _ = await _orderDetailService.GetOrderDetail(id) ?? throw new NotFoundException($"OrderDetail with {id} is not found!");

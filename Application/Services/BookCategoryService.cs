@@ -36,7 +36,7 @@ public class BookCategoryService : IBookCategoryService
 
     public async Task<BookCategoryDto> GetBookCategory(Guid id)
     {
-        var bookCategory = await _repository.BookCategory!.FindByCondition(m => m.Id == id, false).FirstOrDefaultAsync();
+        var bookCategory = await _repository.BookCategory!.FindByCondition(m => m.Id == id).FirstOrDefaultAsync();
         return _mapper.Map<BookCategoryDto>(bookCategory);
     }
 

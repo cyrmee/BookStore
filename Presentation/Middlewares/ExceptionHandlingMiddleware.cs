@@ -29,10 +29,12 @@ public class ExceptionHandlingMiddleware
         var statusCode = HttpStatusCode.InternalServerError;
         var message = exception.Message;
 
-        if (exception is NotFoundException)
-            statusCode = HttpStatusCode.NotFound;
-        else if (exception is ValidationException)
-            statusCode = HttpStatusCode.BadRequest;
+        statusCode = exception switch
+        {
+            NotFoundException => HttpStatusCode.NotFound,
+            ValidationException => HttpStatusCode.BadRequest,
+            _ => statusCode
+        };
 
         var result = JsonConvert.SerializeObject(new { error = message });
         context.Response.ContentType = "application/json";
@@ -51,7 +53,7 @@ public class NotFoundException : Exception
 
 public class ValidationException : Exception
 {
-    public ValidationException(string message) : base(message)
+    protected ValidationException(string message) : base(message)
     {
     }
 }

@@ -13,9 +13,9 @@ public class Book : BaseEntity
     public DateTime PublicationDate { get; set; }
     public string ISBN { get; set; } = null!;
     public string Description { get; set; } = null!;
-    public int Quantity { get; set; } = 0;
+    public int Quantity { get; set; }
     public double Price { get; set; }
 
-    public ICollection<OrderDetail> OrderDetails { get; } = new List<OrderDetail>();
-    public ICollection<BookCategory> BookCategories { get; } = new List<BookCategory>();
+    public IEnumerable<OrderDetail> OrderDetails { get; } = new List<OrderDetail>();
+    public IEnumerable<BookCategory> BookCategories { get; } = new List<BookCategory>();
 }

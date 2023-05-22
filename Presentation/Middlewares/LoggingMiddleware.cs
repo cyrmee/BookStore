@@ -18,12 +18,12 @@ public class LoggingMiddleware
     {
         var stopwatch = Stopwatch.StartNew();
         var originalBodyStream = context.Response.Body;
-        var requestBody = string.Empty;
 
         using (var responseBody = new MemoryStream())
         {
             context.Response.Body = responseBody;
             context.Request.EnableBuffering();
+            string requestBody;
             using (var reader = new StreamReader(context.Request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false, bufferSize: 1024, leaveOpen: true))
             {
                 requestBody = await reader.ReadToEndAsync();
@@ -35,9 +35,9 @@ public class LoggingMiddleware
             var request = context.Request;
             var ipAddress = context.Connection.RemoteIpAddress?.ToString();
             var userAgent = request.Headers["User-Agent"].ToString();
-            var user = context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (context.Request.Method == "PUT" || context.Request.Method == "PATCH" || context.Request.Method == "DELETE")
+            if (context.Request.Method is "PUT" or "PATCH" or "DELETE")
                 Log.Information("HTTP {RequestMethod} {RequestPath} received from {IpAddress} ({UserAgent}), " +
                     "Username {user}, Request Body: {requestBody}",
                     request.Method, request.Path, ipAddress, userAgent, user, requestBody);

@@ -36,7 +36,7 @@ public class OrderService : IOrderService
 
     public async Task<OrderDto> GetOrder(Guid id)
     {
-        var order = await _repository.Order!.FindByCondition(m => m.Id == id, false).FirstOrDefaultAsync();
+        var order = await _repository.Order!.FindByCondition(m => m.Id == id).FirstOrDefaultAsync();
         return _mapper.Map<OrderDto>(order);
     }
 

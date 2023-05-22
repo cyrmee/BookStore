@@ -36,7 +36,7 @@ public class BookService : IBookService
 
     public async Task<BookDto> GetBook(Guid id)
     {
-        var book = await _repository.Book!.FindByCondition(m => m.Id == id, false).FirstOrDefaultAsync();
+        var book = await _repository.Book!.FindByCondition(m => m.Id == id).FirstOrDefaultAsync();
         return _mapper.Map<BookDto>(book);
     }
 

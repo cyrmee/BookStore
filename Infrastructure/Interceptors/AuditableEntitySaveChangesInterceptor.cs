@@ -21,12 +21,12 @@ public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    static void UpdateEntities(DbContext? dbContext)
+    private static void UpdateEntities(DbContext? dbContext)
     {
         if (dbContext == null) return;
 
         var entries = dbContext.ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
+            .Where(e => e.State is EntityState.Added or EntityState.Modified)
             .Select(e => e);
 
         foreach (var entry in entries)
@@ -44,6 +44,14 @@ public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
                     case EntityState.Modified:
                         entity.UpdatedDate = DateTime.UtcNow;
                         break;
+                    case EntityState.Detached:
+                        break;
+                    case EntityState.Unchanged:
+                        break;
+                    case EntityState.Deleted:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }

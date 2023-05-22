@@ -22,10 +22,7 @@ public abstract class ServiceCollections
     {
         builder.AddControllers();
         builder.AddEndpointsApiExplorer();  
-        builder.AddAuthorization(options =>
-        {
-
-        });
+        builder.AddAuthorization();
     }
 
     public static void RegisterAuthenticationServices(IServiceCollection builderServices, AppSettings? appSettings) =>
@@ -54,7 +51,7 @@ public abstract class ServiceCollections
         builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
         builder.Services.AddDbContext<BookStoreDbContext>(opt =>
                 opt.UseNpgsql(connectionString));
-        //ApplyDatabaseMigrations(builder.Services);
+        ApplyDatabaseMigrations(builder.Services);
     }
 
     private static void ApplyDatabaseMigrations(IServiceCollection services)

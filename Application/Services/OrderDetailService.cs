@@ -36,7 +36,7 @@ public class OrderDetailService : IOrderDetailService
 
     public async Task<OrderDetailDto> GetOrderDetail(Guid id)
     {
-        var orderDetail = await _repository.OrderDetail!.FindByCondition(m => m.Id == id, false).FirstOrDefaultAsync();
+        var orderDetail = await _repository.OrderDetail!.FindByCondition(m => m.Id == id).FirstOrDefaultAsync();
         return _mapper.Map<OrderDetailDto>(orderDetail);
     }
 

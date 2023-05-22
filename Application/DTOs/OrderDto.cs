@@ -1,5 +1,4 @@
 ﻿using Domain.Types;
-using System.ComponentModel.DataAnnotations;
 
 namespace Application.DTOs;
 

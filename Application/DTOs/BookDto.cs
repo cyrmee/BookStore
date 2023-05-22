@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Application.DTOs;
+﻿namespace Application.DTOs;
 
 public record BookDto
 (

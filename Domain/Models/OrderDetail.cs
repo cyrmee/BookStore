@@ -1,6 +1,4 @@
-﻿using Domain.Models;
-
-namespace Domain.Models;
+﻿namespace Domain.Models;
 
 public class OrderDetail : BaseEntity
 {

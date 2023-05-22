@@ -23,7 +23,7 @@ public class BookController : ControllerBase
         return Ok(books);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<BookDto>> GetBook(Guid id)
     {
         var book = await _bookService.GetBook(id);
@@ -51,10 +51,10 @@ public class BookController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteBook(Guid id)
     {
-        _ = await _bookService.GetBook(id) ?? throw new NotFoundException($"Book category with {id} is not found!");
+        _ = await _bookService.GetBook(id) ?? throw new NotFoundException($"Book with ID {id} is not found!");
         await _bookService.Delete(id);
         return NoContent();
     }

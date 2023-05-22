@@ -15,5 +15,5 @@ public class BaseEntity
     public DateTime UpdatedDate { get; set; }
     public string UpdatedBy { get; set; } = string.Empty;
     public string AddedBy { get; set; } = string.Empty;
-    public bool IsDeleted { get; set; } = false;
+    public bool IsDeleted { get; set; }
 }
