@@ -31,14 +31,14 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddBook(BookDto bookDto)
+    public async Task<IActionResult> AddBook(BookWriteDto bookDto)
     {
         await _bookService.Add(bookDto);
         return CreatedAtAction(nameof(AddBook), "Book added successfully!");
     }
 
     [HttpPost("range")]
-    public async Task<IActionResult> AddBookRange(List<BookDto> bookDtos)
+    public async Task<IActionResult> AddBookRange(List<BookWriteDto> bookDtos)
     {
         await _bookService.AddRange(bookDtos);
         return CreatedAtAction(nameof(AddBookRange), "Books added successfully!");

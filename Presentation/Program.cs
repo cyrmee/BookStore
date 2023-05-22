@@ -10,8 +10,8 @@ ServiceCollections.RegisterSwaggerServices(builder.Services);
 ServiceCollections.RegisterRepositories(builder.Services);
 ServiceCollections.RegisterApplicationServices(builder.Services);
 ServiceCollections.RegisterAuthenticationServices(builder.Services, config);
-ServiceCollections.RegisterDatabaseServices(builder, config!.ConnectionStrings.DefaultConnection!);
-ServiceCollections.RegisterSerilogServices(builder.Services, builder.Host, config!.ConnectionStrings.DefaultConnection!);
+ServiceCollections.RegisterDatabaseServices(builder, config!.ConnectionStrings.DefaultConnection);
+ServiceCollections.RegisterSerilogServices(builder.Services, builder.Host, config.ConnectionStrings.DefaultConnection);
 
 var app = builder.Build();
 
@@ -21,7 +21,7 @@ if(app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

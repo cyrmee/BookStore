@@ -6,8 +6,4 @@ public record CategoryDto
     string Name
 );
 
-// Read DTO
-public record CategoryReadDto(Guid Id, string Name);
-
-// Write DTO
 public record CategoryWriteDto(string Name);

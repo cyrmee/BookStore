@@ -46,6 +46,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         => await _context.Set<T>().CountAsync();
 
     public IQueryable<T> GetPaginated(int page, int pageSize)
-        => _context.Set<T>().OrderBy(m => m.CreatedDate).ThenBy(m => m.UpdatedDate).Skip(page * pageSize)
-                .Take(pageSize);
+    => _context.Set<T>()
+        .OrderBy(m => m.CreatedDate)
+        .ThenBy(m => m.UpdatedDate)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize);
+
 }

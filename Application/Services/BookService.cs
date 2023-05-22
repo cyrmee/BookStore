@@ -10,8 +10,8 @@ public interface IBookService
 {
     public Task<List<BookDto>> GetAllAsync();
     public Task<BookDto> GetBook(Guid id);
-    public Task Add(BookDto book);
-    public Task AddRange(List<BookDto> books);
+    public Task Add(BookWriteDto book);
+    public Task AddRange(List<BookWriteDto> books);
     public Task Update(BookDto book);
     public Task Delete(Guid id);
     public Task DeleteRange(List<BookDto> books);
@@ -40,13 +40,13 @@ public class BookService : IBookService
         return _mapper.Map<BookDto>(book);
     }
 
-    public async Task Add(BookDto bookDto)
+    public async Task Add(BookWriteDto bookDto)
     {
         _repository.Book!.Add(_mapper.Map<Book>(bookDto));
         await _repository.SaveAsync();
     }
 
-    public async Task AddRange(List<BookDto> bookDtos)
+    public async Task AddRange(List<BookWriteDto> bookDtos)
     {
         _repository.Book!.AddRange(_mapper.Map<List<Book>>(bookDtos));
         await _repository.SaveAsync();

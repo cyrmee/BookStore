@@ -51,10 +51,10 @@ public abstract class ServiceCollections
 
     public static void RegisterDatabaseServices(WebApplicationBuilder builder, string connectionString)
     {
+        builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
         builder.Services.AddDbContext<BookStoreDbContext>(opt =>
                 opt.UseNpgsql(connectionString));
-        builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
-        ApplyDatabaseMigrations(builder.Services);
+        //ApplyDatabaseMigrations(builder.Services);
     }
 
     private static void ApplyDatabaseMigrations(IServiceCollection services)
@@ -91,10 +91,19 @@ public abstract class ServiceCollections
         builderServices.AddSingleton(_ => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Book, BookDto>().ReverseMap();
+            cfg.CreateMap<Book, BookWriteDto>().ReverseMap();
+
             cfg.CreateMap<BookCategory, BookCategoryDto>().ReverseMap();
+            cfg.CreateMap<BookCategory, BookCategoryWriteDto>().ReverseMap();
+            
             cfg.CreateMap<Category, CategoryDto>().ReverseMap();
+            cfg.CreateMap<Category, CategoryWriteDto>().ReverseMap();
+
             cfg.CreateMap<OrderDetail, OrderDetailDto>().ReverseMap();
+            cfg.CreateMap<OrderDetail, OrderDetailWriteDto>().ReverseMap();
+
             cfg.CreateMap<Order, OrderDto>().ReverseMap();
+            cfg.CreateMap<Order, OrderWriteDto>().ReverseMap();
         }).CreateMapper());
         
 

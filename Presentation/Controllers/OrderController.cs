@@ -31,14 +31,14 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddOrder(OrderDto orderDto)
+    public async Task<IActionResult> AddOrder(OrderWriteDto orderDto)
     {
         await _orderService.Add(orderDto);
         return CreatedAtAction(nameof(AddOrder), "Order added successfully!");
     }
 
     [HttpPost("range")]
-    public async Task<IActionResult> AddOrderRange(List<OrderDto> orderDtos)
+    public async Task<IActionResult> AddOrderRange(List<OrderWriteDto> orderDtos)
     {
         await _orderService.AddRange(orderDtos);
         return CreatedAtAction(nameof(AddOrderRange), "Orders added successfully!");

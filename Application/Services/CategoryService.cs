@@ -10,8 +10,8 @@ public interface ICategoryService
 {
     public Task<List<CategoryDto>> GetAllAsync();
     public Task<CategoryDto> GetCategory(Guid id);
-    public Task Add(CategoryDto category);
-    public Task AddRange(List<CategoryDto> categories);
+    public Task Add(CategoryWriteDto category);
+    public Task AddRange(List<CategoryWriteDto> categories);
     public Task Update(CategoryDto category);
     public Task Delete(Guid id);
     public Task DeleteRange(List<CategoryDto> categories);
@@ -40,13 +40,13 @@ public class CategoryService : ICategoryService
         return _mapper.Map<CategoryDto>(category);
     }
 
-    public async Task Add(CategoryDto categoryDto)
+    public async Task Add(CategoryWriteDto categoryDto)
     {
         _repository.Category!.Add(_mapper.Map<Category>(categoryDto));
         await _repository.SaveAsync();
     }
 
-    public async Task AddRange(List<CategoryDto> categoryDtos)
+    public async Task AddRange(List<CategoryWriteDto> categoryDtos)
     {
         _repository.Category!.AddRange(_mapper.Map<List<Category>>(categoryDtos));
         await _repository.SaveAsync();

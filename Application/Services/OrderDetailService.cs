@@ -10,8 +10,8 @@ public interface IOrderDetailService
 {
     public Task<List<OrderDetailDto>> GetAllAsync();
     public Task<OrderDetailDto> GetOrderDetail(Guid id);
-    public Task Add(OrderDetailDto orderDetail);
-    public Task AddRange(List<OrderDetailDto> orderDetails);
+    public Task Add(OrderDetailWriteDto orderDetail);
+    public Task AddRange(List<OrderDetailWriteDto> orderDetails);
     public Task Update(OrderDetailDto orderDetail);
     public Task Delete(Guid id);
     public Task DeleteRange(List<OrderDetailDto> orderDetails);
@@ -40,13 +40,13 @@ public class OrderDetailService : IOrderDetailService
         return _mapper.Map<OrderDetailDto>(orderDetail);
     }
 
-    public async Task Add(OrderDetailDto orderDetailDto)
+    public async Task Add(OrderDetailWriteDto orderDetailDto)
     {
         _repository.OrderDetail!.Add(_mapper.Map<OrderDetail>(orderDetailDto));
         await _repository.SaveAsync();
     }
 
-    public async Task AddRange(List<OrderDetailDto> orderDetailDtos)
+    public async Task AddRange(List<OrderDetailWriteDto> orderDetailDtos)
     {
         _repository.OrderDetail!.AddRange(_mapper.Map<List<OrderDetail>>(orderDetailDtos));
         await _repository.SaveAsync();

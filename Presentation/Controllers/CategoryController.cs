@@ -31,14 +31,14 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddCategory(CategoryDto categoryDto)
+    public async Task<IActionResult> AddCategory(CategoryWriteDto categoryDto)
     {
         await _categoryService.Add(categoryDto);
         return CreatedAtAction(nameof(AddCategory), "Category added successfully!");
     }
 
     [HttpPost("range")]
-    public async Task<IActionResult> AddCategoryRange(List<CategoryDto> categoryDtos)
+    public async Task<IActionResult> AddCategoryRange(List<CategoryWriteDto> categoryDtos)
     {
         await _categoryService.AddRange(categoryDtos);
         return CreatedAtAction(nameof(AddCategoryRange), "Categories added successfully!");

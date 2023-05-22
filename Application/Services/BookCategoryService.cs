@@ -10,8 +10,8 @@ public interface IBookCategoryService
 {
     public Task<List<BookCategoryDto>> GetAllAsync();
     public Task<BookCategoryDto> GetBookCategory(Guid id);
-    public Task Add(BookCategoryDto bookCategory);
-    public Task AddRange(List<BookCategoryDto> bookCategories);
+    public Task Add(BookCategoryWriteDto bookCategory);
+    public Task AddRange(List<BookCategoryWriteDto> bookCategories);
     public Task Update(BookCategoryDto bookCategory);
     public Task Delete(Guid id);
     public Task DeleteRange(List<BookCategoryDto> bookCategories);
@@ -40,13 +40,13 @@ public class BookCategoryService : IBookCategoryService
         return _mapper.Map<BookCategoryDto>(bookCategory);
     }
 
-    public async Task Add(BookCategoryDto bookCategoryDto)
+    public async Task Add(BookCategoryWriteDto bookCategoryDto)
     {
         _repository.BookCategory!.Add(_mapper.Map<BookCategory>(bookCategoryDto));
         await _repository.SaveAsync();
     }
 
-    public async Task AddRange(List<BookCategoryDto> bookCategoryDtos)
+    public async Task AddRange(List<BookCategoryWriteDto> bookCategoryDtos)
     {
         _repository.BookCategory!.AddRange(_mapper.Map<List<BookCategory>>(bookCategoryDtos));
         await _repository.SaveAsync();

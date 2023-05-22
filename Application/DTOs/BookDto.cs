@@ -12,14 +12,14 @@ public record BookDto
     string ISBN,
     string Description,
     int Quantity,
-    double Price
-)
-{
-    public DateTime PublicationDate { get; set; } = PublicationDate;
-}
+    double Price);
 
-// Read DTO
-public record BookReadDto(Guid Id, string Title, string Author, string Publisher, DateTime PublicationDate, string ISBN, string Description, int Quantity, double Price);
-
-// Write DTO
-public record BookWriteDto(string Title, string Author, string Publisher, DateTime PublicationDate, string ISBN, string Description, int Quantity, double Price);
+public record BookWriteDto(
+    string Title,
+    string Author,
+    string Publisher,
+    DateTime PublicationDate,
+    string ISBN,
+    string Description,
+    int Quantity,
+    double Price);

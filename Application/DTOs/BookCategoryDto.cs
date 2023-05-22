@@ -7,8 +7,4 @@ public record BookCategoryDto
     Guid CategoryId
 );
 
-// Read DTO
-public record BookCategoryReadDto(Guid Id, Guid BookId, Guid CategoryId);
-
-// Write DTO
 public record BookCategoryWriteDto(Guid BookId, Guid CategoryId);

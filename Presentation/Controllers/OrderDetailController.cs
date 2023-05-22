@@ -31,14 +31,14 @@ public class OrderDetailController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddOrderDetail(OrderDetailDto orderDetailDto)
+    public async Task<IActionResult> AddOrderDetail(OrderDetailWriteDto orderDetailDto)
     {
         await _orderDetailService.Add(orderDetailDto);
         return CreatedAtAction(nameof(AddOrderDetail), "OrderDetail added successfully!");
     }
 
     [HttpPost("range")]
-    public async Task<IActionResult> AddOrderDetailRange(List<OrderDetailDto> orderDetailDtos)
+    public async Task<IActionResult> AddOrderDetailRange(List<OrderDetailWriteDto> orderDetailDtos)
     {
         await _orderDetailService.AddRange(orderDetailDtos);
         return CreatedAtAction(nameof(AddOrderDetailRange), "OrderDetails added successfully!");
