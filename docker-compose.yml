@@ -25,6 +25,20 @@ services:
       - backend
     restart: always
 
+  webapi:
+    container_name: book_store_api
+    build:
+      context: .
+      dockerfile: Presentation/Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+    restart: always
+
 networks:
   backend:
 

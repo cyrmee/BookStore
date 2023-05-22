@@ -54,7 +54,16 @@ public abstract class ServiceCollections
         builder.Services.AddDbContext<BookStoreDbContext>(opt =>
                 opt.UseNpgsql(connectionString));
         builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        ApplyDatabaseMigrations(builder.Services);
+    }
 
+    private static void ApplyDatabaseMigrations(IServiceCollection services)
+    {
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+        var dbContext = serviceProvider.GetRequiredService<BookStoreDbContext>();
+
+        dbContext.Database.Migrate();
     }
 
     public static void RegisterApplicationServices(IServiceCollection builderServices)
