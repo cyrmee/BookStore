@@ -39,7 +39,7 @@ This command will start the containers defined in the `docker-compose.yml` file.
 
 ### Step 4: Access the Application
 
-Once the containers are up and running, you can access the application in your web browser at `http://localhost:5000`. If everything is set up correctly, you should see the application's interface.
+Once the containers are up and running, you can access the application in your web browser at `http://localhost:5000` or simply at `http://localhost`. If everything is set up correctly, you should see the application's interface.
 
 ### Additional Notes
 
