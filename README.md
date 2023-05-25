@@ -46,10 +46,6 @@ Once the containers are up and running, you can access the application in your w
 - The PostgreSQL database container will be accessible at `localhost:5432`, and the default Redis container will be accessible at `localhost:6379`.
 - The Nginx container will be running on port 80 and forwarding requests to the web API container.
 
-## Contributing
-
-Explain how others can contribute to the project, such as by submitting bug reports or pull requests.
-
 ## License
 
 MIT License
