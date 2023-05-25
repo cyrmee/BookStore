@@ -32,7 +32,7 @@ After creating the `.env` file, update the connection string in the `appsettings
 Open a terminal or command prompt, navigate to the project's root directory, and run the following command to build and run the Docker containers:
 
 ```bash
-docker-compose up -d --build
+docker compose up --build -d
 ```
 
 This command will start the containers defined in the `docker-compose.yml` file. The `-d` flag runs the containers in detached mode, allowing them to continue running in the background.
