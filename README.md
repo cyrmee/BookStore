@@ -10,7 +10,7 @@ Make sure you have the following installed on your system:
 3. Run the following command to clone the repository:
 
 ```shell
-git clone <repository_url>
+git clone https://github.com/cyrmee/BookStore
 ```
 
 ## Step 2: Set Up Environment Variables
