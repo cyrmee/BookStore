@@ -50,6 +50,4 @@ Here is an overview of the project's folder structure:
 - `Infrastructure`: Contains the infrastructure-related code, such as configurations, data access, and migrations.
 - `Presentation`: Contains the presentation layer code, including controllers, middlewares, and configurations.
 
-Feel free to explore these folders to understand the project's organization and make any necessary modifications.
-
-That's it! You have successfully installed and set up the project. You can now start using the application.
+That's it! You have successfully installed and set up the project.
