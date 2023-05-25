@@ -38,8 +38,9 @@ docker compose up --build -d
 
 This command will build and start the containers defined in the `docker-compose.yml` file.
 
-## Step 5: Access the Application
-Once the containers are up and running, you can access the application in your web browser at `http://localhost:5000`. The application will be served by the `webapi` container.
+### Step 5: Access the Application
+- To access the application through Nginx, open your web browser and visit `http://localhost`.
+- To access the API directly, open your web browser and visit `http://localhost:5000`. The API is served by the `webapi` container.
 
 ## Folder Structure
 Here is an overview of the project's folder structure:
