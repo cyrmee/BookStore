@@ -42,7 +42,7 @@ git clone https://github.com/cyrmee/BookStore
 ## Step 2: Set Up Environment Variables
 1. In the root directory of the cloned repository, create a new file named `.env`.
 2. Open the `.env` file in a text editor.
-3. Copy the contents of the docker-compose.yml file provided and paste them into the `.env` file.
+3. Copy the contents of the .env.example file provided and paste them into the `.env` file.
 4. Replace the placeholder values in the `.env` file with your own values:
    - `POSTGRES_USER`: Replace with the username for the PostgreSQL database.
    - `POSTGRES_PASSWORD`: Replace with the password for the PostgreSQL database.
