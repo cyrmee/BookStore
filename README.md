@@ -28,7 +28,7 @@ To install and set up the project, please follow the steps below:
 
 ## Prerequisites
 Make sure you have the following installed on your system:
-- Docker: https://www.docker.com/get-started
+- Docker: https://docs.docker.com/get-docker/
 
 ## Step 1: Clone the Repository
 1. Open your terminal or command prompt.
