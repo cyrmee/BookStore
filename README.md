@@ -22,7 +22,7 @@ The API offers the following features:
 - Real-time Updates: Utilize SignalR for real-time communication and updates.
 - API Documentation: Explore API endpoints and test them using Swagger UI.
 
-##Installation
+## Installation
 
 To install and set up the project, please follow the steps below:
 
