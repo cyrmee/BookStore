@@ -1,3 +1,29 @@
+# BookStore API
+
+BookStore API is a RESTful web service that provides functionality for managing books, categories, orders, and user information. It serves as the backend for a bookstore application, allowing users to browse and purchase books online.
+
+## Technologies Used
+
+- Programming Language: C# with ASP.NET Core
+- Database: Entity Framework Core with PostgreSQL
+- Authentication and Authorization: JSON Web Tokens (JWT)
+- Real-time Communication: SignalR
+- API Documentation: Swagger/OpenAPI
+- Containerization: Docker
+
+## Features
+
+The API offers the following features:
+
+- Book Management: Create, retrieve, update, and delete books.
+- Category Management: Manage book categories.
+- Order Management: Place new orders, retrieve orders, and manage order details.
+- User Management: Authenticate users and authorize access to protected resources.
+- Real-time Updates: Utilize SignalR for real-time communication and updates.
+- API Documentation: Explore API endpoints and test them using Swagger UI.
+
+##Installation
+
 To install and set up the project, please follow the steps below:
 
 ## Prerequisites
