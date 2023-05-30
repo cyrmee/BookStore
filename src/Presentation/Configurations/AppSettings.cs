@@ -7,6 +7,7 @@ public record AppSettings
     public Logging Logging { get; set; }
     public string AllowedHosts { get; set; }
     public JwtBearer JwtBearer { get; set; }
+    public RedisCache RedisCache { get; set; }
 }
 
 public class ConnectionStrings
@@ -28,5 +29,11 @@ public class JwtBearer
     public string Issuer { get; set; }
     public string Audience { get; set; }
     public string Key { get; set; }
+}
+
+public class RedisCache
+{
+    public string ConnectionString { get; set; }
+    public string InstanceName { get; set; }
 }
 #pragma warning restore CS8618

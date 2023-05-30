@@ -13,6 +13,7 @@ using Application.DTOs;
 using Application.Services;
 using Domain.Repositories;
 using Infrastructure.DataAccess;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 
 namespace Presentation.Configurations;
 
@@ -23,10 +24,11 @@ public abstract class ServiceCollections
         builder.AddControllers();
         builder.AddEndpointsApiExplorer();  
         builder.AddAuthorization();
+        builder.AddMemoryCache();
     }
 
-    public static void RegisterAuthenticationServices(IServiceCollection builderServices, AppSettings? appSettings) =>
-        builderServices.AddAuthentication(options =>
+    public static void RegisterAuthenticationServices(IServiceCollection services, AppSettings? appSettings) =>
+        services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -63,29 +65,38 @@ public abstract class ServiceCollections
         dbContext.Database.Migrate();
     }
 
-    public static void RegisterApplicationServices(IServiceCollection builderServices)
+    public static void RegisterRedisCache(IServiceCollection services, AppSettings config)
     {
-        builderServices.AddScoped<IBookService, BookService>();
-        builderServices.AddScoped<IBookCategoryService, BookCategoryService>();
-        builderServices.AddScoped<ICategoryService, CategoryService>();
-        builderServices.AddScoped<IOrderService, OrderService>();
-        builderServices.AddScoped<IOrderDetailService, OrderDetailService>();
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = config.RedisCache.ConnectionString;
+            options.InstanceName = config.RedisCache.InstanceName;
+        });
     }
 
-    public static void RegisterRepositories(IServiceCollection builderServices)
+    public static void RegisterApplicationServices(IServiceCollection services)
     {
-        builderServices.AddScoped<IRepository, Repository>();
+        services.AddScoped<IBookService, BookService>();
+        services.AddScoped<IBookCategoryService, BookCategoryService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IOrderDetailService, OrderDetailService>();
     }
 
-    public static void RegisterSwaggerServices(IServiceCollection builderServices) =>
-        builderServices.AddSwaggerGen(options =>
+    public static void RegisterRepositories(IServiceCollection services)
+    {
+        services.AddScoped<IRepository, Repository>();
+    }
+
+    public static void RegisterSwaggerServices(IServiceCollection services) =>
+        services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Store API", Version = "v1" });
         });
 
 
-    public static void RegisterAutoMapper(IServiceCollection builderServices) =>
-        builderServices.AddSingleton(_ => new MapperConfiguration(cfg =>
+    public static void RegisterAutoMapper(IServiceCollection services) =>
+        services.AddSingleton(_ => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Book, BookDto>().ReverseMap();
             cfg.CreateMap<Book, BookWriteDto>().ReverseMap();
@@ -104,7 +115,7 @@ public abstract class ServiceCollections
         }).CreateMapper());
         
 
-    public static void RegisterSerilogServices(IServiceCollection builderServices, ConfigureHostBuilder hostBuilder, string connectionString)
+    public static void RegisterSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, string connectionString)
     {
         Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -119,7 +130,7 @@ public abstract class ServiceCollections
 
         hostBuilder.UseSerilog();
 
-        builderServices.AddLogging(loggingBuilder =>
+        services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog();

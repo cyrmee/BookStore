@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Presentation.Middlewares;
 
 namespace Presentation.Controllers;
@@ -10,10 +11,12 @@ namespace Presentation.Controllers;
 public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
+    private readonly IDistributedCache _cache;
 
-    public BookController(IBookService bookService)
+    public BookController(IBookService bookService, IDistributedCache cache)
     {
         _bookService = bookService;
+        _cache = cache;
     }
 
     [HttpGet]

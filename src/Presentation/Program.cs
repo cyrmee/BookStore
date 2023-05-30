@@ -11,6 +11,7 @@ ServiceCollections.RegisterRepositories(builder.Services);
 ServiceCollections.RegisterApplicationServices(builder.Services);
 ServiceCollections.RegisterAuthenticationServices(builder.Services, config);
 ServiceCollections.RegisterDatabaseServices(builder, config!.ConnectionStrings.DefaultConnection);
+ServiceCollections.RegisterRedisCache(builder.Services, config);
 ServiceCollections.RegisterSerilogServices(builder.Services, builder.Host, config.ConnectionStrings.DefaultConnection);
 
 var app = builder.Build();
