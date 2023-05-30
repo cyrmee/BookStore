@@ -1,8 +1,34 @@
+# BookStore API
+
+BookStore API is a RESTful web service that provides functionality for managing books, categories, orders, and user information. It serves as the backend for a bookstore application, allowing users to browse and purchase books online.
+
+## Technologies Used
+
+- Programming Language: C# with ASP.NET Core
+- Database: Entity Framework Core with PostgreSQL
+- Authentication and Authorization: JSON Web Tokens (JWT)
+- Real-time Communication: SignalR
+- API Documentation: Swagger/OpenAPI
+- Containerization: Docker
+
+## Features
+
+The API offers the following features:
+
+- Book Management: Create, retrieve, update, and delete books.
+- Category Management: Manage book categories.
+- Order Management: Place new orders, retrieve orders, and manage order details.
+- User Management: Authenticate users and authorize access to protected resources.
+- Real-time Updates: Utilize SignalR for real-time communication and updates.
+- API Documentation: Explore API endpoints and test them using Swagger UI.
+
+## Installation
+
 To install and set up the project, please follow the steps below:
 
 ## Prerequisites
 Make sure you have the following installed on your system:
-- Docker: https://www.docker.com/get-started
+- Docker: https://docs.docker.com/get-docker/
 
 ## Step 1: Clone the Repository
 1. Open your terminal or command prompt.
@@ -16,7 +42,7 @@ git clone https://github.com/cyrmee/BookStore
 ## Step 2: Set Up Environment Variables
 1. In the root directory of the cloned repository, create a new file named `.env`.
 2. Open the `.env` file in a text editor.
-3. Copy the contents of the docker-compose.yml file provided and paste them into the `.env` file.
+3. Copy the contents of the .env.example file provided and paste them into the `.env` file.
 4. Replace the placeholder values in the `.env` file with your own values:
    - `POSTGRES_USER`: Replace with the username for the PostgreSQL database.
    - `POSTGRES_PASSWORD`: Replace with the password for the PostgreSQL database.
@@ -26,6 +52,18 @@ git clone https://github.com/cyrmee/BookStore
 1. In the root directory of the cloned repository, navigate to the `Presentation` folder.
 2. Open the `appsettings.json` file in a text editor.
 3. Find the connection string and update the `"host"` value with the container name of the PostgreSQL database. The container name should be the same as specified in the `docker-compose.yml` file.
+
+Here's an example of how the updated connection string might look like:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=postgres_container_name;Port=5432;Database=bookstore_db;User Id=your_username;Password=your_password;"
+}
+```
+
+Make sure to replace "postgres_container_name" with the actual container name of your PostgreSQL database, "your_username" with the appropriate username, and "your_password" with the corresponding password.
+
+Save the changes to the appsettings.json file after making the necessary modifications.
 
 ## Step 4: Build and Run the Docker Containers
 1. Open your terminal or command prompt.
