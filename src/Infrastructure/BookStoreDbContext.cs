@@ -56,10 +56,10 @@ public class BookStoreDbContext : IdentityDbContext<User>
         optionsBuilder.AddInterceptors(_auditableEntitySaveChangesInterceptor);
     }
 
-    public virtual DbSet<Book> Books { get; set; } = default!;
-    public virtual DbSet<BookCategory> BookCategories { get; set; } = default!;
-    public virtual DbSet<Category> Categories { get; set; } = default!;
-    public virtual DbSet<Order> Orders { get; set; } = default!;
-    public virtual DbSet<OrderDetail> OrdersDetails { get; set; } = default!;
-    public virtual DbSet<JwtTokens> JwtTokens{ get; set; } = default!;
+    public DbSet<Book> Books { get; set; } = default!;
+    public DbSet<BookCategory> BookCategories { get; set; } = default!;
+    public DbSet<Category> Categories { get; set; } = default!;
+    public DbSet<Order> Orders { get; set; } = default!;
+    public DbSet<OrderDetail> OrdersDetails { get; set; } = default!;
+    public DbSet<JwtTokens> JwtTokens{ get; set; } = default!;
 }
