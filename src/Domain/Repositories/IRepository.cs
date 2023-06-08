@@ -7,5 +7,6 @@ public interface IRepository
     public ICategoryRepository? Category { get; }
     public IOrderRepository? Order { get; }
     public IOrderDetailRepository? OrderDetail { get; }
+    public IJwtTokensRepository? JwtTokens { get; }
     public Task SaveAsync();
 }

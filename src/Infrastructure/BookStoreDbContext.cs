@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Infrastructure.Interceptors;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Infrastructure;
 
-public class BookStoreDbContext : DbContext
+public class BookStoreDbContext : IdentityDbContext<User>
 {
     private readonly AuditableEntitySaveChangesInterceptor _auditableEntitySaveChangesInterceptor;
 
@@ -13,6 +14,8 @@ public class BookStoreDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Book>(entity =>
         {
             entity.HasMany(e => e.OrderDetails)
@@ -58,4 +61,5 @@ public class BookStoreDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; } = default!;
     public virtual DbSet<Order> Orders { get; set; } = default!;
     public virtual DbSet<OrderDetail> OrdersDetails { get; set; } = default!;
+    public virtual DbSet<JwtTokens> JwtTokens{ get; set; } = default!;
 }

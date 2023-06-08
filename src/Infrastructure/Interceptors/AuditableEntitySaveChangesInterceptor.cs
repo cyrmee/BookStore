@@ -37,12 +37,12 @@ public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
                 {
                     case EntityState.Added:
                         entity.Id = Guid.NewGuid();
-                        entity.CreatedDate = DateTime.UtcNow;
-                        entity.UpdatedDate = DateTime.UtcNow;
+                        entity.CreatedAt = DateTime.UtcNow;
+                        entity.UpdatedAt = DateTime.UtcNow;
                         entity.IsDeleted = false;
                         break;
                     case EntityState.Modified:
-                        entity.UpdatedDate = DateTime.UtcNow;
+                        entity.UpdatedAt = DateTime.UtcNow;
                         break;
                     case EntityState.Detached:
                         break;

@@ -13,27 +13,29 @@ using Application.DTOs;
 using Application.Services;
 using Domain.Repositories;
 using Infrastructure.DataAccess;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.AspNetCore.Identity;
 
 namespace Presentation.Configurations;
 
 public abstract class ServiceCollections
 {
-    public static void RegisterGeneralAppServices(IServiceCollection builder)
+    public static void RegisterGeneralAppServices(IServiceCollection services)
     {
-        builder.AddControllers();
-        builder.AddEndpointsApiExplorer();  
-        builder.AddAuthorization();
-        builder.AddMemoryCache();
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddAuthorization();
+        services.AddMemoryCache();
     }
 
-    public static void RegisterAuthenticationServices(IServiceCollection services, AppSettings? appSettings) =>
+    public static void RegisterAuthenticationServices(IServiceCollection services, AppSettings? appSettings)
+    {
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
+        })
+        .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -46,13 +48,18 @@ public abstract class ServiceCollections
                 ValidateIssuerSigningKey = true
             };
         });
+    }
 
 
     public static void RegisterDatabaseServices(WebApplicationBuilder builder, string connectionString)
     {
         builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
-        builder.Services.AddDbContext<BookStoreDbContext>(opt =>
-                opt.UseNpgsql(connectionString));
+        builder.Services.AddEntityFrameworkNpgsql()
+                        .AddDbContext<BookStoreDbContext>((sp, options) =>
+                        {
+                            options.UseNpgsql(connectionString);
+                            options.UseInternalServiceProvider(sp);
+                        });
         ApplyDatabaseMigrations(builder.Services);
     }
 
@@ -81,6 +88,7 @@ public abstract class ServiceCollections
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IOrderDetailService, OrderDetailService>();
+        //services.AddScoped<IAuthenticationService, AuthenticationService>();
     }
 
     public static void RegisterRepositories(IServiceCollection services)
@@ -94,7 +102,6 @@ public abstract class ServiceCollections
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Store API", Version = "v1" });
         });
 
-
     public static void RegisterAutoMapper(IServiceCollection services) =>
         services.AddSingleton(_ => new MapperConfiguration(cfg =>
         {
@@ -103,7 +110,7 @@ public abstract class ServiceCollections
 
             cfg.CreateMap<BookCategory, BookCategoryDto>().ReverseMap();
             cfg.CreateMap<BookCategory, BookCategoryWriteDto>().ReverseMap();
-            
+
             cfg.CreateMap<Category, CategoryDto>().ReverseMap();
             cfg.CreateMap<Category, CategoryWriteDto>().ReverseMap();
 
@@ -113,7 +120,6 @@ public abstract class ServiceCollections
             cfg.CreateMap<Order, OrderDto>().ReverseMap();
             cfg.CreateMap<Order, OrderWriteDto>().ReverseMap();
         }).CreateMapper());
-        
 
     public static void RegisterSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, string connectionString)
     {

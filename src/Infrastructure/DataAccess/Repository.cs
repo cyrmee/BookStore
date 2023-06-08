@@ -14,6 +14,7 @@ public class Repository : IRepository
     private ICategoryRepository? CategoryRepository { get; set; }
     private IOrderRepository? OrderRepository { get; set; }
     private IOrderDetailRepository? OrderDetailRepository { get; set; }
+    private IJwtTokensRepository? JwtTokensRepository { get; set; }
 
     public IBookRepository? Book
     {
@@ -60,6 +61,14 @@ public class Repository : IRepository
         }
     }
 
+    public IJwtTokensRepository? JwtTokens
+    {
+        get
+        {
+            JwtTokensRepository ??= new JwtTokensRepository(_context);
+            return JwtTokensRepository;
+        }
+    }
     public async Task SaveAsync()
         => await _context.SaveChangesAsync();
 }
