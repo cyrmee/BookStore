@@ -29,6 +29,9 @@ public abstract class ServiceCollections
 
     public static void RegisterAuthenticationServices(IServiceCollection services, AppSettings? appSettings)
     {
+        services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<BookStoreDbContext>();
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -88,7 +91,7 @@ public abstract class ServiceCollections
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IOrderDetailService, OrderDetailService>();
-        //services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
     }
 
     public static void RegisterRepositories(IServiceCollection services)
@@ -124,15 +127,15 @@ public abstract class ServiceCollections
     public static void RegisterSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, string connectionString)
     {
         Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-        .Enrich.FromLogContext()
-        .Enrich.WithProperty("OS", Environment.OSVersion)
-        .Enrich.WithProperty("MachineName", Environment.MachineName)
-        .Enrich.WithProperty("ProcessId", Environment.ProcessId)
-        .Enrich.WithProperty("ThreadId", Environment.CurrentManagedThreadId)
-        .WriteTo.Console()
-        .WriteTo.PostgreSQL(connectionString, "Logs", needAutoCreateTable: true, restrictedToMinimumLevel: LogEventLevel.Information)
-        .CreateLogger();
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Information).Enrich
+                     .FromLogContext().Enrich
+                     .WithProperty("OS", Environment.OSVersion).Enrich
+                     .WithProperty("MachineName", Environment.MachineName).Enrich
+                     .WithProperty("ProcessId", Environment.ProcessId).Enrich
+                     .WithProperty("ThreadId", Environment.CurrentManagedThreadId).WriteTo
+                     .Console().WriteTo
+                     .PostgreSQL(connectionString, "Logs", needAutoCreateTable: true, restrictedToMinimumLevel: LogEventLevel.Information)
+                     .CreateLogger();
 
         hostBuilder.UseSerilog();
 
