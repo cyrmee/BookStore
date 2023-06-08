@@ -1,8 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Domain.Models;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +15,7 @@ public interface IAuthenticationService
     Task<bool> IsTokenRevoked(string token);
     Task<string?> RevokeToken(string token);
     Task<string> GenerateJwtToken(User user);
+    DateTime GetTokenExpirationDays();
 }
 
 public class AuthenticationService : IAuthenticationService
@@ -100,11 +99,7 @@ public class AuthenticationService : IAuthenticationService
                 claims.AddRange(roleClaims);
             }
         }
-
-        claims.Add(new Claim(ClaimTypes.UserData, JsonSerializer.Serialize(user, new JsonSerializerOptions()
-        {
-            ReferenceHandler = ReferenceHandler.Preserve
-        })));
+        
         return claims;
     }
 
@@ -114,10 +109,12 @@ public class AuthenticationService : IAuthenticationService
             audience: _configuration["JwtBearer:Audience"],
             issuer: _configuration["JwtBearer:Issuer"],
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtBearer:TokenExpiration"])),
+            expires: GetTokenExpirationDays(),
             signingCredentials: signingCredentials
         );
 
         return tokenOptions;
     }
+
+    public DateTime GetTokenExpirationDays() => DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtBearer:TokenExpiration"]));
 }

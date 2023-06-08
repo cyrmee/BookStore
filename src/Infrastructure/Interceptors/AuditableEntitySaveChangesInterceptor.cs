@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
+using System.Net;
 
 namespace Infrastructure.Interceptors;
 

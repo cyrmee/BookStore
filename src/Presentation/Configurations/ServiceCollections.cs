@@ -23,7 +23,6 @@ public abstract class ServiceCollections
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddAuthorization();
         services.AddMemoryCache();
     }
 
@@ -51,6 +50,7 @@ public abstract class ServiceCollections
                 ValidateIssuerSigningKey = true
             };
         });
+        services.AddAuthorization();
     }
 
 
@@ -106,22 +106,24 @@ public abstract class ServiceCollections
         });
 
     public static void RegisterAutoMapper(IServiceCollection services) =>
-        services.AddSingleton(_ => new MapperConfiguration(cfg =>
+        services.AddSingleton(_ => new MapperConfiguration(m =>
         {
-            cfg.CreateMap<Book, BookDto>().ReverseMap();
-            cfg.CreateMap<Book, BookWriteDto>().ReverseMap();
+            m.CreateMap<Book, BookDto>().ReverseMap();
+            m.CreateMap<Book, BookWriteDto>().ReverseMap();
 
-            cfg.CreateMap<BookCategory, BookCategoryDto>().ReverseMap();
-            cfg.CreateMap<BookCategory, BookCategoryWriteDto>().ReverseMap();
+            m.CreateMap<BookCategory, BookCategoryDto>().ReverseMap();
+            m.CreateMap<BookCategory, BookCategoryWriteDto>().ReverseMap();
 
-            cfg.CreateMap<Category, CategoryDto>().ReverseMap();
-            cfg.CreateMap<Category, CategoryWriteDto>().ReverseMap();
+            m.CreateMap<Category, CategoryDto>().ReverseMap();
+            m.CreateMap<Category, CategoryWriteDto>().ReverseMap();
 
-            cfg.CreateMap<OrderDetail, OrderDetailDto>().ReverseMap();
-            cfg.CreateMap<OrderDetail, OrderDetailWriteDto>().ReverseMap();
+            m.CreateMap<OrderDetail, OrderDetailDto>().ReverseMap();
+            m.CreateMap<OrderDetail, OrderDetailWriteDto>().ReverseMap();
 
-            cfg.CreateMap<Order, OrderDto>().ReverseMap();
-            cfg.CreateMap<Order, OrderWriteDto>().ReverseMap();
+            m.CreateMap<Order, OrderDto>().ReverseMap();
+            m.CreateMap<Order, OrderWriteDto>().ReverseMap();
+
+            m.CreateMap<User, UserSignupDto>().ReverseMap();
         }).CreateMapper());
 
     public static void RegisterSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, string connectionString)

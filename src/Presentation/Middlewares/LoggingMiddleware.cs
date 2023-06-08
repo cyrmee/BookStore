@@ -1,6 +1,5 @@
 ﻿using Serilog;
 using System.Diagnostics;
-using System.Security.Claims;
 using System.Text;
 
 namespace Presentation.Middlewares;
@@ -35,15 +34,16 @@ public class LoggingMiddleware
             var request = context.Request;
             var ipAddress = context.Connection.RemoteIpAddress?.ToString();
             var userAgent = request.Headers["User-Agent"].ToString();
-            var user = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // var user = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = context.User.Identity!.Name;
 
             if (context.Request.Method is "PUT" or "PATCH" or "DELETE")
                 Log.Information("HTTP {RequestMethod} {RequestPath} received from {IpAddress} ({UserAgent}), " +
-                    "Username {user}, Request Body: {requestBody}",
+                    "Username: {user}, Request Body: {requestBody}",
                     request.Method, request.Path, ipAddress, userAgent, user, requestBody);
             else
                 Log.Information("HTTP {RequestMethod} {RequestPath} received from {IpAddress} ({UserAgent}), " +
-                    "Username {user}",
+                    "Username: {user}",
                     request.Method, request.Path, ipAddress, userAgent, user);
 
             stopwatch.Stop();
