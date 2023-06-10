@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BookStoreDbContext))]
-    [Migration("20230608112604_Initial")]
+    [Migration("20230610170948_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -46,12 +46,16 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ISBN")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Isbn10")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                    b.Property<string>("Isbn13")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<double>("Price")
                         .HasColumnType("double precision");

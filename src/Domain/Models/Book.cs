@@ -11,7 +11,9 @@ public class Book : BaseEntity
     [DataType(DataType.Date)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
     public DateTime PublicationDate { get; set; }
-    public string ISBN { get; set; } = null!;
+    public string Isbn10 { get; set; } = null!;
+    public string Isbn13 { get; set; } = null!;
+
     public string Description { get; set; } = null!;
     public int Quantity { get; set; }
     public double Price { get; set; }

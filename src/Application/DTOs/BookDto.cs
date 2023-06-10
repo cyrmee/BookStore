@@ -7,7 +7,8 @@ public record BookDto
     string Author,
     string Publisher,
     DateTime PublicationDate,
-    string ISBN,
+    string Isbn10,
+    string Isbn13,
     string Description,
     int Quantity,
     double Price);
@@ -17,7 +18,8 @@ public record BookWriteDto(
     string Author,
     string Publisher,
     DateTime PublicationDate,
-    string ISBN,
+    string Isbn10,
+    string Isbn13,
     string Description,
     int Quantity,
     double Price);

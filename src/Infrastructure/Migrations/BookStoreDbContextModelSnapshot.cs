@@ -43,12 +43,16 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ISBN")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Isbn10")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                    b.Property<string>("Isbn13")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<double>("Price")
                         .HasColumnType("double precision");

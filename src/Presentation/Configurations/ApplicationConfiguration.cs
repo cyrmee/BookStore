@@ -16,19 +16,33 @@ using Infrastructure.DataAccess;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
 using Presentation.Filters;
+using BookStore.Infrastructure.Seeding;
 
 namespace Presentation.Configurations;
 
-public abstract class ServiceCollections
+public abstract class ApplicationConfiguration
 {
-    public static void RegisterGeneralAppServices(IServiceCollection services)
+    public static void Configure(WebApplicationBuilder builder, AppSettings appSettings)
+    {
+        ConfigureGeneralAppServices(builder.Services);
+        ConfigureAuthenticationServices(builder.Services, appSettings);
+        ConfigureApplicationServices(builder.Services);
+        ConfigureRepositories(builder.Services);
+        ConfigureDatabaseServices(builder.Services, appSettings);
+        ConfigureRedisCache(builder.Services, appSettings);
+        ConfigureSwaggerServices(builder.Services);
+        ConfigureAutoMapper(builder.Services);
+        ConfigureSerilogServices(builder.Services, builder.Host, appSettings);
+    }
+
+    private static void ConfigureGeneralAppServices(IServiceCollection services)
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddMemoryCache();
     }
 
-    public static void RegisterAuthenticationServices(IServiceCollection services, AppSettings? appSettings)
+    private static void ConfigureAuthenticationServices(IServiceCollection services, AppSettings? appSettings)
     {
         services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<BookStoreDbContext>();
@@ -55,38 +69,7 @@ public abstract class ServiceCollections
         services.AddAuthorization();
     }
 
-
-    public static void RegisterDatabaseServices(WebApplicationBuilder builder, string connectionString)
-    {
-        builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
-        builder.Services.AddEntityFrameworkNpgsql()
-                        .AddDbContext<BookStoreDbContext>((sp, options) =>
-                        {
-                            options.UseNpgsql(connectionString);
-                            options.UseInternalServiceProvider(sp);
-                        });
-        ApplyDatabaseMigrations(builder.Services);
-    }
-
-    private static void ApplyDatabaseMigrations(IServiceCollection services)
-    {
-        using var scope = services.BuildServiceProvider().CreateScope();
-        var serviceProvider = scope.ServiceProvider;
-        var dbContext = serviceProvider.GetRequiredService<BookStoreDbContext>();
-
-        dbContext.Database.Migrate();
-    }
-
-    public static void RegisterRedisCache(IServiceCollection services, AppSettings config)
-    {
-        services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = config.RedisCache.ConnectionString;
-            options.InstanceName = config.RedisCache.InstanceName;
-        });
-    }
-
-    public static void RegisterApplicationServices(IServiceCollection services)
+    private static void ConfigureApplicationServices(IServiceCollection services)
     {
         services.AddScoped<IBookService, BookService>();
         services.AddScoped<IBookCategoryService, BookCategoryService>();
@@ -96,13 +79,58 @@ public abstract class ServiceCollections
         services.AddScoped<IAuthenticationService, AuthenticationService>();
     }
 
-    public static void RegisterRepositories(IServiceCollection services)
+    private static void ConfigureRepositories(IServiceCollection services)
     {
         services.AddScoped<IRepository, Repository>();
     }
 
-    public static void RegisterSwaggerServices(IServiceCollection services)
-    {   
+    private static void ConfigureDatabaseServices(IServiceCollection services, AppSettings appSettings)
+    {
+        services.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        services.AddEntityFrameworkNpgsql()
+                        .AddDbContext<BookStoreDbContext>((sp, options) =>
+                        {
+                            options.UseNpgsql(appSettings!.ConnectionStrings.DefaultConnection);
+                            options.UseInternalServiceProvider(sp);
+                        });
+
+        ApplyDatabaseMigrations(services);
+        EnsureDataPopulated(services);
+    }
+
+    private static void ApplyDatabaseMigrations(IServiceCollection services)
+    {
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var _bookStoreDbContext = scope.ServiceProvider.GetRequiredService<BookStoreDbContext>();
+
+        _bookStoreDbContext.Database.Migrate();
+    }
+
+    private static void EnsureDataPopulated(IServiceCollection services)
+    {
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var _repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var _roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var _userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+        DataSeeder.SeedBooks(_repository).Wait();
+        DataSeeder.SeedCategories(_repository).Wait();
+        IdentitySeeder.SeedAspNetRoles(_roleManager).Wait();
+        IdentitySeeder.SeedAdminUser(_userManager).Wait();
+    }
+
+    private static void ConfigureRedisCache(IServiceCollection services, AppSettings config)
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = config.RedisCache.ConnectionString;
+            options.InstanceName = config.RedisCache.InstanceName;
+        });
+    }
+
+
+    private static void ConfigureSwaggerServices(IServiceCollection services)
+    {
         services.AddSwaggerGen(c =>
         {
             var solutionName = Assembly.GetEntryAssembly()?.GetName().Name;
@@ -132,17 +160,17 @@ public abstract class ServiceCollections
                         Id = "Bearer"
                     }
                 },
-                new string[] {}
+                Array.Empty<string>()
             }
             };
             c.AddSecurityRequirement(securityRequirement);
 
             // Add the JwtBearer token filter
-            // c.OperationFilter<SecurityRequirementsOperationFilter>();
+            c.OperationFilter<SecurityRequirementsOperationFilter>();
         });
     }
 
-    public static void RegisterAutoMapper(IServiceCollection services) =>
+    private static void ConfigureAutoMapper(IServiceCollection services) =>
         services.AddSingleton(_ => new MapperConfiguration(m =>
         {
             m.CreateMap<Book, BookDto>().ReverseMap();
@@ -164,7 +192,7 @@ public abstract class ServiceCollections
             m.CreateMap<User, UserInfoDto>().ReverseMap();
         }).CreateMapper());
 
-    public static void RegisterSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, string connectionString)
+    private static void ConfigureSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, AppSettings appSettings)
     {
         Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Override("Microsoft", LogEventLevel.Information).Enrich
@@ -174,7 +202,7 @@ public abstract class ServiceCollections
                      .WithProperty("ProcessId", Environment.ProcessId).Enrich
                      .WithProperty("ThreadId", Environment.CurrentManagedThreadId).WriteTo
                      .Console().WriteTo
-                     .PostgreSQL(connectionString, "Logs", needAutoCreateTable: true, restrictedToMinimumLevel: LogEventLevel.Information)
+                     .PostgreSQL(appSettings.ConnectionStrings.DefaultConnection, "Logs", needAutoCreateTable: true, restrictedToMinimumLevel: LogEventLevel.Information)
                      .CreateLogger();
 
         hostBuilder.UseSerilog();
