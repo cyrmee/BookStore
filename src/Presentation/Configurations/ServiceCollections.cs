@@ -14,6 +14,8 @@ using Application.Services;
 using Domain.Repositories;
 using Infrastructure.DataAccess;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection;
+using Presentation.Filters;
 
 namespace Presentation.Configurations;
 
@@ -99,11 +101,46 @@ public abstract class ServiceCollections
         services.AddScoped<IRepository, Repository>();
     }
 
-    public static void RegisterSwaggerServices(IServiceCollection services) =>
-        services.AddSwaggerGen(options =>
+    public static void RegisterSwaggerServices(IServiceCollection services)
+    {   
+        services.AddSwaggerGen(c =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Store API", Version = "v1" });
+            var solutionName = Assembly.GetEntryAssembly()?.GetName().Name;
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = solutionName, Version = "v1" });
+
+            // Add the JWT bearer authentication scheme to Swagger
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme."
+            };
+            c.AddSecurityDefinition("Bearer", securityScheme);
+
+            // Add the JWT bearer authentication requirement to Swagger operations
+            var securityRequirement = new OpenApiSecurityRequirement
+            {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] {}
+            }
+            };
+            c.AddSecurityRequirement(securityRequirement);
+
+            // Add the JwtBearer token filter
+            // c.OperationFilter<SecurityRequirementsOperationFilter>();
         });
+    }
 
     public static void RegisterAutoMapper(IServiceCollection services) =>
         services.AddSingleton(_ => new MapperConfiguration(m =>
@@ -124,6 +161,7 @@ public abstract class ServiceCollections
             m.CreateMap<Order, OrderWriteDto>().ReverseMap();
 
             m.CreateMap<User, UserSignupDto>().ReverseMap();
+            m.CreateMap<User, UserInfoDto>().ReverseMap();
         }).CreateMapper());
 
     public static void RegisterSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, string connectionString)

@@ -11,3 +11,24 @@ public record UserSignupDto(
     string PhoneNumber,
     string Password
 );
+
+public record UserLockDto(
+    string UserName,
+    double LockoutInDays
+);
+
+public record UserUnlockDto(
+    string UserName
+);
+
+public record UserChangePasswordDto(
+    string UserName,
+    string OldPassword,
+    string NewPassword
+);
+
+public record UserInfoDto(
+    string UserName,
+    string Email,
+    string PhoneNumber
+);

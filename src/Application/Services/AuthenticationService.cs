@@ -13,7 +13,7 @@ namespace Application.Services;
 public interface IAuthenticationService
 {
     Task<bool> IsTokenRevoked(string token);
-    Task<string?> RevokeToken(string token);
+    Task RevokeTokens(string username);
     Task<string> GenerateJwtToken(User user);
     DateTime GetTokenExpirationDays();
 }
@@ -35,17 +35,23 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<bool> IsTokenRevoked(string token)
     {
-        var revokedToken = await _repository.JwtTokens!.FindByCondition(t => t.TokenValue == token).FirstOrDefaultAsync();
-        return revokedToken != null || revokedToken!.IsRevoked;
+        var revokedToken = await _repository.JwtTokens!.FindByCondition(t => t.TokenValue == token && t.IsRevoked)
+                                                       .FirstOrDefaultAsync();
+        return revokedToken != null;
     }
 
-    public async Task<string?> RevokeToken(string token)
+    public async Task RevokeTokens(string username)
     {
-        var revokedToken = await _repository.JwtTokens!.FindByCondition(t => t.TokenValue == token).FirstOrDefaultAsync();
-        revokedToken!.IsRevoked = true;
-        _repository.JwtTokens.Update(revokedToken);
+        var tokens = await _repository.JwtTokens!.FindByCondition(t => t.UserName == username).ToListAsync();
+
+        foreach (var token in tokens)
+        {
+            token.IsRevoked = true;
+            token.RevocationDate = DateTime.UtcNow;
+            _repository.JwtTokens.Update(token);
+        }
+
         await _repository.SaveAsync();
-        return revokedToken?.TokenValue;
     }
 
     public async Task<string> GenerateJwtToken(User user)
@@ -99,7 +105,7 @@ public class AuthenticationService : IAuthenticationService
                 claims.AddRange(roleClaims);
             }
         }
-        
+
         return claims;
     }
 

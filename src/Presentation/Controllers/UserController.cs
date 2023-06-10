@@ -2,6 +2,7 @@
 using Application.Services;
 using AutoMapper;
 using Domain.Models;
+using Domain.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,7 @@ public class UserController : ControllerBase
         }
 
         // Return user data
-        return Ok(user);
+        return Ok(_mapper.Map<UserInfoDto>(user));
     }
 
     [HttpPost("login")]
@@ -46,15 +47,18 @@ public class UserController : ControllerBase
     public async Task<ActionResult> Login([FromBody] UserLoginDto userLoginDto)
     {
         var user = await _userManager.FindByNameAsync(userLoginDto.UserName);
-        if (user != null && await _userManager.CheckPasswordAsync(user, userLoginDto.Password))
+        if (user != null
+            && await _userManager.CheckPasswordAsync(user, userLoginDto.Password))
         {
+            if (await _userManager.IsLockedOutAsync(user))
+                return Unauthorized();
             return Ok(new
             {
                 token = await _authenticationService.GenerateJwtToken(user),
                 expiration = _authenticationService.GetTokenExpirationDays()
             });
         }
-        return Unauthorized();
+        return NotFound();
     }
 
     [HttpPost("signup")]
@@ -86,4 +90,73 @@ public class UserController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+    [HttpPost]
+    [Authorize(Roles = $"{UserRole.Manager}, {UserRole.Customer}")]
+    [Route("changepassword")]
+    public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordDto userChangePasswordDto)
+    {
+        var user = await _userManager.FindByNameAsync(userChangePasswordDto.UserName);
+
+        if (user != null)
+        {
+            if (await _userManager.CheckPasswordAsync(user, userChangePasswordDto.OldPassword))
+            {
+                var result = await _userManager.ChangePasswordAsync(user, userChangePasswordDto.OldPassword, userChangePasswordDto.NewPassword);
+
+                if (!result.Succeeded) { return BadRequest(result.Errors); }
+
+                return Ok();
+            }
+            else
+                return Conflict("Old password incorrect!");
+        }
+
+        return NotFound("User not found!");
+    }
+
+    [HttpPatch]
+    // [Authorize(Roles = $"{UserRole.Manager}")]
+    [Route("lockUser")]
+    public async Task<ActionResult> LockUser([FromBody] UserLockDto userLockDto)
+    {
+        var user = await _userManager.FindByNameAsync(userLockDto.UserName);
+
+        if (user != null)
+        {
+            var lockoutEndDate = DateTime.UtcNow.AddDays(userLockDto.LockoutInDays);
+            var lockoutResult = await _userManager.SetLockoutEndDateAsync(user, lockoutEndDate);
+
+            // revoke all tokens asscoicated with the user
+            await _authenticationService.RevokeTokens(userLockDto.UserName);
+
+            if (lockoutResult.Succeeded) return NoContent();
+
+            return BadRequest(lockoutResult.Errors);
+        }
+
+        return NotFound("User not found!");
+    }
+
+    [HttpPatch]
+    // [Authorize(Roles = $"{UserRole.Manager}")]
+    [Route("unlockUser")]
+    public async Task<ActionResult> UnlockUser([FromBody] UserUnlockDto userUnlockDto)
+    {
+        var user = await _userManager.FindByNameAsync(userUnlockDto.UserName);
+
+        if (user != null)
+        {
+            var unlockResult = await _userManager.SetLockoutEndDateAsync(user, null);
+
+            // Optional: Perform any additional actions or revoke tokens associated with unlocking the user
+
+            if (unlockResult.Succeeded) return NoContent();
+
+            return BadRequest(unlockResult.Errors);
+        }
+
+        return NotFound("User not found!");
+    }
+
 }
