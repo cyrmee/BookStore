@@ -22,32 +22,32 @@ namespace Presentation.Configurations;
 
 public abstract class ApplicationConfiguration
 {
-    public static void Configure(WebApplicationBuilder builder, AppSettings appSettings)
+    public static void Configure(WebApplicationBuilder builder)
     {
-        ConfigureGeneralAppServices(builder.Services);
-        ConfigureAuthenticationServices(builder.Services, appSettings);
-        ConfigureApplicationServices(builder.Services);
-        ConfigureRepositories(builder.Services);
-        ConfigureDatabaseServices(builder.Services, appSettings);
-        ConfigureRedisCache(builder.Services, appSettings);
-        ConfigureSwaggerServices(builder.Services);
-        ConfigureAutoMapper(builder.Services);
-        ConfigureSerilogServices(builder.Services, builder.Host, appSettings);
+        ConfigureGeneralAppServices(builder);
+        ConfigureAuthenticationServices(builder);
+        ConfigureApplicationServices(builder);
+        ConfigureRepositories(builder);
+        ConfigureDatabaseServices(builder);
+        ConfigureRedisCache(builder);
+        ConfigureSwaggerServices(builder);
+        ConfigureAutoMapper(builder);
+        ConfigureSerilogServices(builder);
     }
 
-    private static void ConfigureGeneralAppServices(IServiceCollection services)
+    private static void ConfigureGeneralAppServices(WebApplicationBuilder builder)
     {
-        services.AddControllers();
-        services.AddEndpointsApiExplorer();
-        services.AddMemoryCache();
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddMemoryCache();
     }
 
-    private static void ConfigureAuthenticationServices(IServiceCollection services, AppSettings? appSettings)
+    private static void ConfigureAuthenticationServices(WebApplicationBuilder builder)
     {
-        services.AddIdentity<User, IdentityRole>()
+        builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<BookStoreDbContext>();
 
-        services.AddAuthentication(options =>
+        builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,58 +57,58 @@ public abstract class ApplicationConfiguration
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidIssuer = appSettings!.JwtBearer.Issuer,
-                ValidAudience = appSettings.JwtBearer.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.JwtBearer.Key)),
+                ValidIssuer = builder.Configuration["JwtBearer:Issuer"],
+                ValidAudience = builder.Configuration["JwtBearer:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:Key"]!)),
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = true
             };
         });
-        services.AddAuthorization();
+        builder.Services.AddAuthorization();
     }
 
-    private static void ConfigureApplicationServices(IServiceCollection services)
+    private static void ConfigureApplicationServices(WebApplicationBuilder builder)
     {
-        services.AddScoped<IBookService, BookService>();
-        services.AddScoped<IBookCategoryService, BookCategoryService>();
-        services.AddScoped<ICategoryService, CategoryService>();
-        services.AddScoped<IOrderService, OrderService>();
-        services.AddScoped<IOrderDetailService, OrderDetailService>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddScoped<IBookService, BookService>();
+        builder.Services.AddScoped<IBookCategoryService, BookCategoryService>();
+        builder.Services.AddScoped<ICategoryService, CategoryService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+        builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
     }
 
-    private static void ConfigureRepositories(IServiceCollection services)
+    private static void ConfigureRepositories(WebApplicationBuilder builder)
     {
-        services.AddScoped<IRepository, Repository>();
+        builder.Services.AddScoped<IRepository, Repository>();
     }
 
-    private static void ConfigureDatabaseServices(IServiceCollection services, AppSettings appSettings)
+    private static void ConfigureDatabaseServices(WebApplicationBuilder builder)
     {
-        services.AddScoped<AuditableEntitySaveChangesInterceptor>();
-        services.AddEntityFrameworkNpgsql()
+        builder.Services.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        builder.Services.AddEntityFrameworkNpgsql()
                         .AddDbContext<BookStoreDbContext>((sp, options) =>
                         {
-                            options.UseNpgsql(appSettings!.ConnectionStrings.DefaultConnection);
+                            options.UseNpgsql(builder.Configuration["ConnectionStrings:DefaultConnection"]);
                             options.UseInternalServiceProvider(sp);
                         });
 
-        ApplyDatabaseMigrations(services);
-        EnsureDataPopulated(services);
+        ApplyDatabaseMigrations(builder);
+        EnsureDataPopulated(builder);
     }
 
-    private static void ApplyDatabaseMigrations(IServiceCollection services)
+    private static void ApplyDatabaseMigrations(WebApplicationBuilder builder)
     {
-        using var scope = services.BuildServiceProvider().CreateScope();
+        using var scope = builder.Services.BuildServiceProvider().CreateScope();
         var _bookStoreDbContext = scope.ServiceProvider.GetRequiredService<BookStoreDbContext>();
 
         _bookStoreDbContext.Database.Migrate();
     }
 
-    private static void EnsureDataPopulated(IServiceCollection services)
+    private static void EnsureDataPopulated(WebApplicationBuilder builder)
     {
-        using var scope = services.BuildServiceProvider().CreateScope();
+        using var scope = builder.Services.BuildServiceProvider().CreateScope();
         var _repository = scope.ServiceProvider.GetRequiredService<IRepository>();
         var _roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var _userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -119,19 +119,19 @@ public abstract class ApplicationConfiguration
         IdentitySeeder.SeedAdminUser(_userManager).Wait();
     }
 
-    private static void ConfigureRedisCache(IServiceCollection services, AppSettings config)
+    private static void ConfigureRedisCache(WebApplicationBuilder builder)
     {
-        services.AddStackExchangeRedisCache(options =>
+        builder.Services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = config.RedisCache.ConnectionString;
-            options.InstanceName = config.RedisCache.InstanceName;
+            options.Configuration = builder.Configuration["RedisCache:ConnectionString"];
+            options.InstanceName = builder.Configuration["RedisCache:InstanceName"];
         });
     }
 
 
-    private static void ConfigureSwaggerServices(IServiceCollection services)
+    private static void ConfigureSwaggerServices(WebApplicationBuilder builder)
     {
-        services.AddSwaggerGen(c =>
+        builder.Services.AddSwaggerGen(c =>
         {
             var solutionName = Assembly.GetEntryAssembly()?.GetName().Name;
             c.SwaggerDoc("v1", new OpenApiInfo { Title = solutionName, Version = "v1" });
@@ -170,8 +170,8 @@ public abstract class ApplicationConfiguration
         });
     }
 
-    private static void ConfigureAutoMapper(IServiceCollection services) =>
-        services.AddSingleton(_ => new MapperConfiguration(m =>
+    private static void ConfigureAutoMapper(WebApplicationBuilder builder) =>
+        builder.Services.AddSingleton(_ => new MapperConfiguration(m =>
         {
             m.CreateMap<Book, BookDto>().ReverseMap();
             m.CreateMap<Book, BookWriteDto>().ReverseMap();
@@ -192,7 +192,7 @@ public abstract class ApplicationConfiguration
             m.CreateMap<User, UserInfoDto>().ReverseMap();
         }).CreateMapper());
 
-    private static void ConfigureSerilogServices(IServiceCollection services, ConfigureHostBuilder hostBuilder, AppSettings appSettings)
+    private static void ConfigureSerilogServices(WebApplicationBuilder builder)
     {
         Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Override("Microsoft", LogEventLevel.Information).Enrich
@@ -202,12 +202,12 @@ public abstract class ApplicationConfiguration
                      .WithProperty("ProcessId", Environment.ProcessId).Enrich
                      .WithProperty("ThreadId", Environment.CurrentManagedThreadId).WriteTo
                      .Console().WriteTo
-                     .PostgreSQL(appSettings.ConnectionStrings.DefaultConnection, "Logs", needAutoCreateTable: true, restrictedToMinimumLevel: LogEventLevel.Information)
+                     .PostgreSQL(builder.Configuration["ConnectionStrings:DefaultConnection"], "Logs", needAutoCreateTable: true, restrictedToMinimumLevel: LogEventLevel.Information)
                      .CreateLogger();
 
-        hostBuilder.UseSerilog();
+        builder.Host.UseSerilog();
 
-        services.AddLogging(loggingBuilder =>
+        builder.Services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog();

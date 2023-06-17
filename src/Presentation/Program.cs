@@ -2,9 +2,8 @@ using Presentation.Configurations;
 using Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
-var appSettings = builder.Configuration.Get<AppSettings>();
 
-ApplicationConfiguration.Configure(builder, appSettings!);
+ApplicationConfiguration.Configure(builder);
 
 var app = builder.Build();
 
