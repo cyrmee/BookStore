@@ -15,18 +15,17 @@ namespace Presentation.Controllers;
 public class UserController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IAuthenticationService _authenticationService;
     private readonly IMapper _mapper;
 
-    public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IAuthenticationService authenticationService, IMapper mapper)
+    public UserController(UserManager<User> userManager, IAuthenticationService authenticationService, IMapper mapper)
     {
         _userManager = userManager;
-        _roleManager = roleManager;
         _authenticationService = authenticationService;
         _mapper = mapper;
     }
 
+    [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> GetCurrentUser()
     {
@@ -55,7 +54,7 @@ public class UserController : ControllerBase
             return Ok(new
             {
                 token = await _authenticationService.GenerateJwtToken(user),
-                expiration = _authenticationService.GetTokenExpirationDays()
+                expiration = _authenticationService.GetTokenExpiration()
             });
         }
         return NotFound();
@@ -74,11 +73,7 @@ public class UserController : ControllerBase
             var user = _mapper.Map<User>(userSignupDto);
 
             var result = await _userManager.CreateAsync(user, userSignupDto.Password);
-
-            // if (!await _roleManager.RoleExistsAsync(UserRole.Customer))
-            //     await _roleManager.CreateAsync(new IdentityRole(UserRole.Customer));
-
-            // await _userManager.AddToRoleAsync(user, UserRole.Customer);
+            await _userManager.AddToRoleAsync(user, UserRole.Customer);
 
             if (!result.Succeeded)
                 return UnprocessableEntity("User creation failed! Please check user details and try again.");

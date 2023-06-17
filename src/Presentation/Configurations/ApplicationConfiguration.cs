@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Identity;
 using System.Reflection;
 using Presentation.Filters;
 using BookStore.Infrastructure.Seeding;
+using Application.Jobs;
+using Hangfire;
 
 namespace Presentation.Configurations;
 
@@ -33,6 +35,7 @@ public abstract class ApplicationConfiguration
         ConfigureSwaggerServices(builder);
         ConfigureAutoMapper(builder);
         ConfigureSerilogServices(builder);
+        ConfigureHangfireServices(builder);
     }
 
     private static void ConfigureGeneralAppServices(WebApplicationBuilder builder)
@@ -77,6 +80,7 @@ public abstract class ApplicationConfiguration
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
         builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddScoped<ITokenCleanupJob, TokenCleanupJob>();
     }
 
     private static void ConfigureRepositories(WebApplicationBuilder builder)
@@ -212,5 +216,11 @@ public abstract class ApplicationConfiguration
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog();
         });
+    }
+
+    private static void ConfigureHangfireServices(WebApplicationBuilder builder)
+    {
+        builder.Services.AddHangfire(config => config.UseInMemoryStorage());
+        builder.Services.AddHangfireServer();
     }
 }

@@ -15,7 +15,7 @@ public interface IAuthenticationService
     Task<bool> IsTokenRevoked(string token);
     Task RevokeTokens(string username);
     Task<string> GenerateJwtToken(User user);
-    DateTime GetTokenExpirationDays();
+    DateTime GetTokenExpiration();
 }
 
 public class AuthenticationService : IAuthenticationService
@@ -35,9 +35,10 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<bool> IsTokenRevoked(string token)
     {
-        var revokedToken = await _repository.JwtTokens!.FindByCondition(t => t.TokenValue == token && t.IsRevoked)
-                                                       .FirstOrDefaultAsync();
-        return revokedToken != null;
+        var revokedToken = await _repository.JwtTokens!
+                .FindByCondition(t => t.TokenValue == token)
+                .FirstOrDefaultAsync();
+        return revokedToken == null;
     }
 
     public async Task RevokeTokens(string username)
@@ -67,15 +68,15 @@ public class AuthenticationService : IAuthenticationService
 
         var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        _repository.JwtTokens!.Add(entity: new JwtTokens()
+        _repository.JwtTokens!.Add(new JwtTokens()
         {
             UserName = user.UserName!,
             TokenValue = token,
-            ExpirationDate = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtBearer:TokenExpiration"]))
+            ExpirationDate = GetTokenExpiration()
         });
         await _repository.SaveAsync();
 
-        return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        return token;
     }
 
     private async Task<List<Claim>> GetClaims(User user)
@@ -115,12 +116,12 @@ public class AuthenticationService : IAuthenticationService
             issuer: _configuration["JwtBearer:Issuer"],
             audience: _configuration["JwtBearer:Audience"],
             claims: claims,
-            expires: GetTokenExpirationDays(),
+            expires: GetTokenExpiration(),
             signingCredentials: signingCredentials
         );
 
         return tokenOptions;
     }
 
-    public DateTime GetTokenExpirationDays() => DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtBearer:TokenExpiration"]));
+    public DateTime GetTokenExpiration() => DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtBearer:TokenExpiration"]));
 }

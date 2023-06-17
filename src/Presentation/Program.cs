@@ -1,3 +1,4 @@
+using Hangfire;
 using Presentation.Configurations;
 using Presentation.Middlewares;
 
@@ -17,10 +18,14 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHangfireDashboard();
+
 app.UseMiddleware<LoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<AuthenticationMiddleware>();
 
 app.MapControllers();
+
+JobConfiguration.Configure();
 
 app.Run();
