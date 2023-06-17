@@ -112,8 +112,8 @@ public class AuthenticationService : IAuthenticationService
     private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, IEnumerable<Claim> claims)
     {
         var tokenOptions = new JwtSecurityToken(
-            audience: _configuration["JwtBearer:Audience"],
             issuer: _configuration["JwtBearer:Issuer"],
+            audience: _configuration["JwtBearer:Audience"],
             claims: claims,
             expires: GetTokenExpirationDays(),
             signingCredentials: signingCredentials
