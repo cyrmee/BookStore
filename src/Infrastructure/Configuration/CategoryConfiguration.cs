@@ -10,8 +10,7 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         builder.HasMany(e => e.BookCategories)
             .WithOne(e => e.Category)
-            .HasPrincipalKey(e => e.Id)
-            .HasForeignKey(e => e.BookId)
+            .HasForeignKey(e => e.CategoryId)
             .IsRequired();
     }
 }

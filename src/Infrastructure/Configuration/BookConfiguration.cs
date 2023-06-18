@@ -10,13 +10,11 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
     {
         builder.HasMany(e => e.OrderDetails)
             .WithOne(e => e.Book)
-            .HasPrincipalKey(e => e.Id)
             .HasForeignKey(e => e.BookId)
             .IsRequired();
 
         builder.HasMany(e => e.BookCategories)
             .WithOne(e => e.Book)
-            .HasPrincipalKey(e => e.Id)
             .HasForeignKey(e => e.BookId)
             .IsRequired();
     }
