@@ -6,7 +6,7 @@ namespace BookStore.Infrastructure.Seeding;
 
 public class IdentitySeeder
 {
-    public static async Task SeedAspNetRoles(RoleManager<IdentityRole> roleManager)
+    public static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
     {
         var roles = new List<IdentityRole>
         {
@@ -24,11 +24,11 @@ public class IdentitySeeder
         }
     }
 
-    public static async Task SeedAdminUser(UserManager<User> userManager)
+    public static async Task SeedUsers(UserManager<User> userManager)
     {
         var adminUserName = "admin";
         var adminEmail = "admin@example.com";
-        var adminPassword = "Mercyrme1.";
+        var adminPassword = "Admin1.";
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
@@ -41,6 +41,40 @@ public class IdentitySeeder
 
             await userManager.CreateAsync(adminUser, adminPassword);
             await userManager.AddToRoleAsync(adminUser, UserRole.Admin);
+        }
+
+        var managerUserName = "manager";
+        var managerEmail = "manager@example.com";
+        var managerPassword = "Manager1.";
+
+        var managerUser = await userManager.FindByEmailAsync(managerEmail);
+        if (managerUser == null)
+        {
+            managerUser = new User
+            {
+                UserName = managerUserName,
+                Email = managerEmail
+            };
+
+            await userManager.CreateAsync(managerUser, managerPassword);
+            await userManager.AddToRoleAsync(managerUser, UserRole.Manager);
+        }
+
+        var customerUserName = "customer";
+        var customerEmail = "customer@example.com";
+        var customerPassword = "Customer1.";
+
+        var customerUser = await userManager.FindByEmailAsync(customerEmail);
+        if (customerUser == null)
+        {
+            customerUser = new User
+            {
+                UserName = customerUserName,
+                Email = customerEmail
+            };
+
+            await userManager.CreateAsync(customerUser, customerPassword);
+            await userManager.AddToRoleAsync(customerUser, UserRole.Customer);
         }
     }
 }

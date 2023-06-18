@@ -119,8 +119,8 @@ public abstract class ApplicationConfiguration
 
         DataSeeder.SeedBooks(_repository).Wait();
         DataSeeder.SeedCategories(_repository).Wait();
-        IdentitySeeder.SeedAspNetRoles(_roleManager).Wait();
-        IdentitySeeder.SeedAdminUser(_userManager).Wait();
+        IdentitySeeder.SeedRoles(_roleManager).Wait();
+        IdentitySeeder.SeedUsers(_userManager).Wait();
     }
 
     private static void ConfigureRedisCache(WebApplicationBuilder builder)
