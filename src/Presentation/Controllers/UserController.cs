@@ -1,4 +1,5 @@
-﻿using Application.DTOs;
+﻿using System.Security.Claims;
+using Application.DTOs;
 using Application.Services;
 using AutoMapper;
 using Domain.Models;
@@ -25,7 +26,6 @@ public class UserController : ControllerBase
         _mapper = mapper;
     }
 
-    [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> GetCurrentUser()
     {
@@ -53,11 +53,54 @@ public class UserController : ControllerBase
                 return Unauthorized();
             return Ok(new
             {
-                token = await _authenticationService.GenerateJwtToken(user),
-                expiration = _authenticationService.GetTokenExpiration()
+                resfreshToken = await _authenticationService.GenerateRefreshJwtToken(user),
+                resfreshTokenExpiration = _authenticationService.GetRefreshTokenExpiration(),
+                accessToken = await _authenticationService.GenerateAccessJwtToken(user),
+                accessTokenExpiration = _authenticationService.GetAccessTokenExpiration()
             });
         }
         return NotFound();
+    }
+
+    [HttpPost("refreshToken")]
+    [AllowAnonymous]
+    public async Task<ActionResult> RefreshToken(RefreshToken refreshToken)
+    {
+        var principal = await _authenticationService.ValidateToken(refreshToken.Value);
+        var username = principal!.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user != null)
+        {
+            if (await _userManager.IsLockedOutAsync(user))
+                return Unauthorized();
+
+            if (await _authenticationService.ValidateToken(refreshToken.Value) == null)
+                return Unauthorized();
+
+            return Ok(new
+            {
+                accessToken = await _authenticationService.GenerateAccessJwtToken(user),
+                accessTokenExpiration = _authenticationService.GetAccessTokenExpiration()
+            });
+        }
+        return NotFound();
+    }
+
+    [HttpDelete("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        var username = User.Identity!.Name;
+        var user = await _userManager.FindByNameAsync(username!);
+
+        if (user != null)
+        {
+            // revoke all tokens asscoicated with the user
+            await _authenticationService.RevokeTokens(username!);
+            return NoContent();
+        }
+
+        return NotFound("User not found!");
     }
 
     [HttpPost("signup")]
@@ -86,9 +129,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost]
-    [Authorize(Roles = $"{UserRole.Manager}, {UserRole.Customer}")]
-    [Route("changepassword")]
+    [HttpPatch("changePassword")]
     public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordDto userChangePasswordDto)
     {
         var user = await _userManager.FindByNameAsync(userChangePasswordDto.UserName);
@@ -110,9 +151,8 @@ public class UserController : ControllerBase
         return NotFound("User not found!");
     }
 
-    [HttpPatch]
-    // [Authorize(Roles = $"{UserRole.Manager}")]
-    [Route("lockUser")]
+    [HttpPatch("lockUser")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ActionResult> LockUser([FromBody] UserLockDto userLockDto)
     {
         var user = await _userManager.FindByNameAsync(userLockDto.UserName);
@@ -133,9 +173,8 @@ public class UserController : ControllerBase
         return NotFound("User not found!");
     }
 
-    [HttpPatch]
-    // [Authorize(Roles = $"{UserRole.Manager}")]
-    [Route("unlockUser")]
+    [HttpPatch("unlockUser")]
+    [Authorize(Roles = $"{UserRole.Admin}")]
     public async Task<ActionResult> UnlockUser([FromBody] UserUnlockDto userUnlockDto)
     {
         var user = await _userManager.FindByNameAsync(userUnlockDto.UserName);

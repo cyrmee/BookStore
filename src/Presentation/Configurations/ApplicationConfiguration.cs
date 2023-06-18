@@ -65,7 +65,7 @@ public abstract class ApplicationConfiguration
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:Key"]!)),
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = false,
+                ValidateLifetime = true, 
                 ValidateIssuerSigningKey = true
             };
         });

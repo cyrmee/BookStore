@@ -8,7 +8,7 @@ public abstract class JobConfiguration
     public static void Configure()
     {
         RecurringJob.AddOrUpdate<ITokenCleanupJob>(
-                "Remove tokens at midnight, every day",
+                "Remove tokens every 12 hours",
                 x => x.RemoveRevokedTokens(), 
                 "0 */12 * * *");
     }

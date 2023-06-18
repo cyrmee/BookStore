@@ -32,3 +32,7 @@ public record UserInfoDto(
     string Email,
     string PhoneNumber
 );
+
+public record RefreshToken(
+    string Value
+);
