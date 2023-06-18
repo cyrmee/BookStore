@@ -2,6 +2,7 @@
 using Domain.Models;
 using Infrastructure.Interceptors;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Infrastructure.Configuration;
 
 namespace Infrastructure;
 
@@ -15,39 +16,7 @@ public class BookStoreDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Book>(entity =>
-        {
-            entity.HasMany(e => e.OrderDetails)
-            .WithOne(e => e.Book)
-            .HasPrincipalKey(e => e.Id)
-            .HasForeignKey(e => e.BookId)
-            .IsRequired();
-
-            entity.HasMany(e => e.BookCategories)
-            .WithOne(e => e.Book)
-            .HasPrincipalKey(e => e.Id)
-            .HasForeignKey(e => e.BookId)
-            .IsRequired();
-        });
-
-        modelBuilder.Entity<Category>(entity =>
-        {
-            entity.HasMany(e => e.BookCategories)
-            .WithOne(e => e.Category)
-            .HasPrincipalKey(e => e.Id)
-            .HasForeignKey(e => e.BookId)
-            .IsRequired();
-        });
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasMany(e => e.Orders)
-            .WithOne(e => e.User)
-            .HasPrincipalKey(e => e.UserName)
-            .HasForeignKey(e => e.UserName)
-            .IsRequired();
-        });
+        ModelBuilderConfiguration.Apply(modelBuilder);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
