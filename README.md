@@ -1,6 +1,6 @@
-***Installation***
+#Installation
 
-**Prerequisites:**
+##Prerequisites:
 Make sure you have the following installed on your system:
 - Docker: [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
 
