@@ -5,16 +5,12 @@ Make sure you have the following installed on your system:
 - Docker: [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
 
 **Step 1: Clone the Repository**
-1. Open your terminal or command prompt.
-2. Change the current working directory to the location where you want to clone the repository.
-3. Run the following command to clone the repository:
-
 ```shell
 git clone https://github.com/cyrmee/BookStore
 ```
 
 **Step 2: Set Up Environment Variables**
-1. Copy .env.example to `.env`
+1. Copy `.env.example` to `.env`
 ```shell
 cp .env.example .env
 ``` 
@@ -25,7 +21,7 @@ cp .env.example .env
 
 **Step 3: Update Connection String**
 1. In the root directory of the cloned repository, navigate to the `Presentation` folder.
-2. Open the `appsettings.json` file in a text editor.
+2. Open `appsettings.json`.
 3. Find the connection string and update the `"host"` value with the container name of the PostgreSQL database. The container name should be the same as specified in the `docker-compose.yml` file.
 
 Here's an example of how the updated connection string might look like:
@@ -36,13 +32,13 @@ Here's an example of how the updated connection string might look like:
 }
 ```
 
-Make sure to replace "postgres_container_name" with the actual container name of your PostgreSQL database, "your_username" with the appropriate username, and "your_password" with the corresponding password.
+Make sure to replace "postgres_container_name" with the actual container name of your PostgreSQL database found in `.env` file, "your_username" with the appropriate username, and "your_password" with the corresponding password.
 
 Save the changes to the `appsettings.json` file after making the necessary modifications.
 
 **Step 4: Build and Run the Docker Containers**
 1. Open your terminal or command prompt.
-2. Change the current working directory to the root directory of the cloned repository.
+2. Change the current working directory to the root directory of the project.
 3. Run the following command to build and run the Docker containers:
 
 ```shell
