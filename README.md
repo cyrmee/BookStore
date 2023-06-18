@@ -14,7 +14,7 @@ git clone https://github.com/cyrmee/BookStore
 ```
 
 **Step 2: Set Up Environment Variables**
-1. Copy the contents of the .env.example file provided and paste them into the `.env` file.
+1. Copy .env.example to `.env`
 ```shell
 cp .env.example .env
 ``` 
