@@ -43,6 +43,17 @@ public abstract class ApplicationConfiguration
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddMemoryCache();
+
+        // Add CORS policy
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
     }
 
     private static void ConfigureAuthenticationServices(WebApplicationBuilder builder)
@@ -65,7 +76,7 @@ public abstract class ApplicationConfiguration
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:Key"]!)),
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = true, 
+                ValidateLifetime = true,
                 ValidateIssuerSigningKey = true
             };
         });

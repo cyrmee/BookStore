@@ -25,6 +25,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<AuthenticationMiddleware>();
 
 app.MapControllers();
+app.UseCors();
 
 JobConfiguration.Configure();
 
