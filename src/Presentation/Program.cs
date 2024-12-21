@@ -1,4 +1,5 @@
 using Hangfire;
+using Scalar.AspNetCore;
 using Presentation.Configurations;
 using Presentation.Middlewares;
 
@@ -8,10 +9,10 @@ ApplicationConfiguration.Configure(builder);
 
 var app = builder.Build();
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapScalarApiReference();
+    // app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();

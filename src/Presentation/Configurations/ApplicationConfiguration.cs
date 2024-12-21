@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Infrastructure;
 using AutoMapper;
@@ -15,7 +14,6 @@ using Domain.Repositories;
 using Infrastructure.DataAccess;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
-using Presentation.Filters;
 using BookStore.Infrastructure.Seeding;
 using Application.Jobs;
 using Hangfire;
@@ -24,6 +22,16 @@ namespace Presentation.Configurations;
 
 public abstract class ApplicationConfiguration
 {
+    // This is the main configuration method that sets up all services and dependencies for the application
+    // It calls a series of other configuration methods to:
+    // - Configure general app services like controllers, API explorer, CORS
+    // - Set up authentication with JWT bearer tokens
+    // - Register application services and repositories
+    // - Configure the database connection and run migrations
+    // - Set up Redis caching
+    // - Configure AutoMapper for object mapping
+    // - Set up Serilog logging
+    // - Configure Hangfire for background jobs
     public static void Configure(WebApplicationBuilder builder)
     {
         ConfigureGeneralAppServices(builder);
@@ -32,12 +40,10 @@ public abstract class ApplicationConfiguration
         ConfigureRepositories(builder);
         ConfigureDatabaseServices(builder);
         ConfigureRedisCache(builder);
-        ConfigureSwaggerServices(builder);
         ConfigureAutoMapper(builder);
         ConfigureSerilogServices(builder);
         ConfigureHangfireServices(builder);
     }
-
     private static void ConfigureGeneralAppServices(WebApplicationBuilder builder)
     {
         builder.Services.AddControllers();
@@ -140,48 +146,6 @@ public abstract class ApplicationConfiguration
         {
             options.Configuration = builder.Configuration["RedisCache:ConnectionString"];
             options.InstanceName = builder.Configuration["RedisCache:InstanceName"];
-        });
-    }
-
-
-    private static void ConfigureSwaggerServices(WebApplicationBuilder builder)
-    {
-        builder.Services.AddSwaggerGen(c =>
-        {
-            var solutionName = Assembly.GetEntryAssembly()?.GetName().Name;
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = solutionName, Version = "v1" });
-
-            // Add the JWT bearer authentication scheme to Swagger
-            var securityScheme = new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme."
-            };
-            c.AddSecurityDefinition("Bearer", securityScheme);
-
-            // Add the JWT bearer authentication requirement to Swagger operations
-            var securityRequirement = new OpenApiSecurityRequirement
-            {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
-            }
-            };
-            c.AddSecurityRequirement(securityRequirement);
-
-            // Add the JwtBearer token filter
-            c.OperationFilter<SecurityRequirementsOperationFilter>();
         });
     }
 
